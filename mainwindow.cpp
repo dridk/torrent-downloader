@@ -51,6 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(mainWidget);
 
     connect(mRunWidget,SIGNAL(clicked(int)),mFileWidget,SLOT(load(int)));
+    connect(mDLAllButton, SIGNAL(clicked()),mFileWidget, SLOT(downloadAll()));
+    connect(mDLButton, SIGNAL(clicked()),mFileWidget, SLOT(download()));
+    connect(mCancelButton,SIGNAL(clicked()),mFileWidget,SLOT(cancelDownload()));
 
 }
 

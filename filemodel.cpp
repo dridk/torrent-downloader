@@ -27,7 +27,7 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
     {
 
         if (index.column() == EXT_COL)
-        return mDatas.at(index.row()).ext;
+            return mDatas.at(index.row()).ext;
 
         if (index.column() == BARCODE_COL)
             return mDatas.at(index.row()).barcode;
@@ -56,13 +56,25 @@ bool FileModel::setData(const QModelIndex &index, const QVariant &value, int rol
         return false;
     if (role == Qt::CheckStateRole)
     {
-        qDebug()<<value;
+        if ( index.column() == 0)
             mDatas[index.row()].checked = !mDatas[index.row()].checked;
+    }
 
 
+    if (role == Qt::EditRole)
+    {
+        if (index.column() == PROGRESS_COL)
+        {
+
+            mDatas[index.row()].progress = value.toFloat();
+            emit dataChanged(index,index);
+
+
+        }
 
     }
-return true;
+
+    return true;
 }
 
 Qt::ItemFlags FileModel::flags(const QModelIndex &index) const
@@ -71,8 +83,32 @@ Qt::ItemFlags FileModel::flags(const QModelIndex &index) const
     if (index.column() == 0)
         return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsSelectable;
 
-        return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable;
+    return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable;
 
+}
+
+void FileModel::clearProgress()
+{
+    beginResetModel();
+
+    for (int i=0; i<count(); ++i){
+        mDatas[i].progress = 0;
+        mDatas[i].checked = false;
+
+    }
+
+    endResetModel();
+
+}
+
+int FileModel::count() const
+{
+    return mDatas.size();
+}
+
+FileItem &FileModel::item(int row)
+{
+    return mDatas[row];
 }
 
 void FileModel::load(int resultId)
@@ -109,7 +145,7 @@ void FileModel::loadded()
         QJsonParseError error;
 
         QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
-     qDebug()<<Q_FUNC_INFO<<"bam list size "<<doc.array().size();
+        qDebug()<<Q_FUNC_INFO<<"bam list size "<<doc.array().size();
         foreach (QJsonValue value, doc.array())
         {
             FileItem item;

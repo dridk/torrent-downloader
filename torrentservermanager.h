@@ -17,6 +17,8 @@ public :
      QNetworkReply * getResultList(int page=0);
      QNetworkReply * getResult(int resultId);
 
+     QNetworkReply * getFile(const QString& path);
+
 
 
 

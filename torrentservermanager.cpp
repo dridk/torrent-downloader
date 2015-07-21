@@ -61,6 +61,18 @@ QNetworkReply *TorrentServerManager::getResult(int resultId)
     return get(request);
 }
 
+QNetworkReply *TorrentServerManager::getFile(const QString& path)
+{
+    mUrl.setQuery(QUrlQuery());
+    mUrl.setPath(path);
+    qDebug()<<Q_FUNC_INFO<< mUrl;
+
+
+    return get(QNetworkRequest(mUrl));
+
+
+}
+
 TorrentServerManager::TorrentServerManager(QObject *parent)
     :QNetworkAccessManager(parent)
 
