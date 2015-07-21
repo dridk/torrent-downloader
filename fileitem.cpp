@@ -2,6 +2,7 @@
 
 FileItem::FileItem()
 {
-
+      checked = false;
+      progress = 0;
 }
 

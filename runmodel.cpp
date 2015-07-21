@@ -18,7 +18,7 @@ int RunModel::rowCount(const QModelIndex &parent) const
 
 int RunModel::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+    return 3;
 }
 
 QVariant RunModel::data(const QModelIndex &index, int role) const
@@ -33,6 +33,9 @@ QVariant RunModel::data(const QModelIndex &index, int role) const
         if(index.column() == NAME_COL)
             return mDatas.at(index.row()).name;
 
+        if(index.column() == STATUS_COL)
+            return mDatas.at(index.row()).status;
+
         if(index.column() == DATE_COL)
             return mDatas.at(index.row()).date.toString("dd MMM yyyy hh:mm");
 
@@ -43,13 +46,40 @@ QVariant RunModel::data(const QModelIndex &index, int role) const
 
 }
 
+QVariant RunModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+ if( role == Qt::DisplayRole)
+ {
+     if (section == NAME_COL)
+         return "Name";
+     if ( section == DATE_COL)
+         return "Date";
+    if (section == STATUS_COL)
+        return "Status";
+
+ }
+
+ return QVariant();
+}
+
+const RunItem &RunModel::item(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return RunItem();
+
+    else
+        return mDatas.at(index.row());
+
+
+}
+
 void RunModel::load()
 {
 
     mDatas.clear();
 
 
-    QNetworkReply * reply =  TorrentServerManager::i()->getRunList(mOffset);
+    QNetworkReply * reply =  TorrentServerManager::i()->getResultList(mOffset);
 
     connect(reply,SIGNAL(finished()),this,SLOT(loadded()));
 
@@ -105,7 +135,7 @@ void RunModel::loadded()
         item.date         = QDateTime::fromString(value.toObject().value("timeStamp").toString(),Qt::ISODate);
         item.id           = value.toObject().value("id").toInt();
         item.reportLink   = QUrl(value.toObject().value("reportLink").toString());
-
+        item.status       = value.toObject().value("status").toString();
         mDatas.append(item);
 
     }
@@ -113,6 +143,7 @@ void RunModel::loadded()
 
     endResetModel();
 
+    emit finished();
 
 
 }

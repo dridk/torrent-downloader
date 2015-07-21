@@ -13,7 +13,8 @@ class RunModel : public QAbstractTableModel
 public:
     enum {
         NAME_COL = 0,
-        DATE_COL = 1
+        STATUS_COL = 1,
+        DATE_COL = 2
 
     };
     RunModel(QObject * parent = 0);
@@ -21,6 +22,11 @@ public:
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+
+    const RunItem& item(const QModelIndex& index);
+
+
 
 public slots:
     void load();
@@ -30,7 +36,8 @@ public slots:
 protected slots:
     void loadded();
 
-
+signals:
+    void finished();
 
 private:
    QList<RunItem> mDatas;

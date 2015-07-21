@@ -6,7 +6,7 @@
 #include "torrentservermanager.h"
 #include "connectbar.h"
 #include "runwidget.h"
-
+#include "filewidget.h"
 namespace Ui {
 class MainWindow;
 }
@@ -23,6 +23,11 @@ private:
     Ui::MainWindow *ui;
     ConnectBar * mConnectBar;
     RunWidget * mRunWidget;
+    FileWidget * mFileWidget;
+
+    QPushButton * mCancelButton;
+    QPushButton * mDLButton;
+    QPushButton * mDLAllButton;
 
 
 

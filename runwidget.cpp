@@ -11,6 +11,14 @@ RunWidget::RunWidget(QWidget *parent) : QWidget(parent)
 
     mView->setModel(mModel);
 
+    mView->verticalHeader()->hide();
+    mView->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Stretch);
+    mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
+    mView->setAlternatingRowColors(true);
+    mView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    mView->setSelectionMode(QAbstractItemView::SingleSelection);
+
+
     mFilter->setPlaceholderText("Filter...");
     QHBoxLayout * hLayout = new QHBoxLayout;
     hLayout->addWidget(mPrevButton);
@@ -33,6 +41,17 @@ RunWidget::RunWidget(QWidget *parent) : QWidget(parent)
     connect(mPrevButton,SIGNAL(clicked(bool)),mModel,SLOT(prevPage()));
     connect(mNextButton,SIGNAL(clicked(bool)),mModel,SLOT(nextPage()));
 
+    connect(mView,SIGNAL(clicked(QModelIndex)),this,SLOT(viewClicked(QModelIndex)));
+
 
 }
+
+void RunWidget::viewClicked(const QModelIndex &index)
+{
+
+    int runId = mModel->item(index).id;
+    emit clicked(runId);
+
+}
+
 

@@ -12,6 +12,7 @@ public:
   QDateTime date;
   QString reportName;
   QUrl reportLink;
+  QString status;
   int id;
 
 

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QHBoxLayout>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -12,6 +13,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
+    mCancelButton = new QPushButton(tr("Cancel"));
+    mDLButton = new QPushButton(tr("Download"));
+    mDLAllButton = new QPushButton(tr("Download All"));
+
+    QHBoxLayout * hLayout = new QHBoxLayout;
+    hLayout->addWidget(mCancelButton);
+    hLayout->addStretch();
+    hLayout->addWidget(mDLButton);
+    hLayout->addWidget(mDLAllButton);
+
+
+
     mConnectBar = new ConnectBar(this);
 
 
@@ -20,8 +33,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     mRunWidget = new RunWidget();
+    mFileWidget = new FileWidget();
 
-    setCentralWidget(mRunWidget);
+
+    QVBoxLayout * vLayout = new QVBoxLayout;
+
+    QSplitter * splitter = new QSplitter(Qt::Vertical);
+    splitter->addWidget(mRunWidget);
+    splitter->addWidget(mFileWidget);
+
+    vLayout->addWidget(splitter);
+    vLayout->addLayout(hLayout);
+
+    QWidget * mainWidget = new QWidget();
+    mainWidget->setLayout(vLayout);
+
+    setCentralWidget(mainWidget);
+
+    connect(mRunWidget,SIGNAL(clicked(int)),mFileWidget,SLOT(load(int)));
 
 }
 

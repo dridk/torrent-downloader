@@ -9,8 +9,12 @@ public:
     explicit RunWidget(QWidget *parent = 0);
 
 signals:
+    void clicked(int runId);
 
-public slots:
+
+protected slots:
+    void viewClicked(const QModelIndex& index);
+
 
 
 private:
