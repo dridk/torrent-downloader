@@ -8,6 +8,9 @@ class RunWidget : public QWidget
 public:
     explicit RunWidget(QWidget *parent = 0);
 
+
+public slots:
+    void load();
 signals:
     void clicked(int runId);
 

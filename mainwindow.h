@@ -19,6 +19,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void connectToServer();
+    void setCheckedCount(int count);
+
 private:
     Ui::MainWindow *ui;
     ConnectBar * mConnectBar;

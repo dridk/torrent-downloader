@@ -29,13 +29,15 @@ void FileItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             barOption.rect = option.rect.adjusted(5,5,-5,-5);
             barOption.progress =  progress;
             QApplication::style()->drawControl(QStyle::CE_ProgressBar, &barOption,painter);
+            return;
         }
 
         else {
 
-//            painter->drawText(option.rect, Qt::AlignHCenter, QString("click to download"));
-            QStyledItemDelegate::paint(painter, option, index);
+            QString msg = progress == 0 ? "Not downloaded" : "Complete";
 
+            painter->drawText(option.rect, Qt::AlignHCenter|Qt::AlignVCenter, msg);
+            return;
 
         }
 
@@ -45,6 +47,12 @@ void FileItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
     }
 
-    else
+    else {
+
         QStyledItemDelegate::paint(painter, option, index);
+
+    }
+
+
+
 }

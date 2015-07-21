@@ -1,11 +1,13 @@
 #include "runmodel.h"
 #include <QDebug>
+#include <QIcon>
 RunModel::RunModel(QObject * parent)
     :QAbstractTableModel(parent)
 {
 
     mOffset = 0;
-
+    QStringList statusList;
+    statusList<<"Calibration"<<"Signal Processing"<<"Complete";
 }
 
 int RunModel::rowCount(const QModelIndex &parent) const
@@ -33,14 +35,30 @@ QVariant RunModel::data(const QModelIndex &index, int role) const
         if(index.column() == NAME_COL)
             return mDatas.at(index.row()).name;
 
-        if(index.column() == STATUS_COL)
+        if(index.column() == STATUS_COL){
             return mDatas.at(index.row()).status;
+}
 
         if(index.column() == DATE_COL)
             return mDatas.at(index.row()).date.toString("dd MMM yyyy hh:mm");
 
     }
 
+    if ( role == Qt::DecorationRole)
+    {
+        if ( index.column() == 0)
+            return QIcon(":/icons/folder.png");
+
+        if (index.column() == STATUS_COL)
+        {
+            if (mDatas.at(index.row()).status == "Completed")
+                return QIcon(":/icons/bullet_valid.png");
+
+            if (mDatas.at(index.row()).status == "Signal Processing")
+                return QIcon(":/icons/progressbar.png");
+
+        }
+    }
 
     return QVariant();
 

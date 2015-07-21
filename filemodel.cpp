@@ -1,9 +1,12 @@
 #include "filemodel.h"
-
+#include <QIcon>
+#include <QFont>
 FileModel::FileModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
     mPending = false;
+
+
 }
 
 int FileModel::rowCount(const QModelIndex &parent) const
@@ -39,6 +42,15 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
             return mDatas.at(index.row()).progress;
     }
 
+    if (role == Qt::DecorationRole)
+    {
+        if ( index.column() == BARCODE_COL)
+            return QIcon(":/icons/barcode_2d.png");
+
+        if (index.column() == SAMPLE_COL)
+            return QIcon(":/icons/user_nude.png");
+    }
+
     if ( role == Qt::CheckStateRole)
     {
         if (index.column() == 0)
@@ -46,28 +58,41 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
     }
 
 
+    if ( role == Qt::FontRole)
+    {
+        QFont font;
+        if ( mDatas.at(index.row()).checked)
+            font.setBold(true);
+        return font;
+    }
+
     return QVariant();
 
 }
 
-bool FileModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool FileModel::setData(const QModelIndex &idx, const QVariant &value, int role)
 {
-    if (!index.isValid())
+    if (!idx.isValid())
         return false;
     if (role == Qt::CheckStateRole)
     {
-        if ( index.column() == 0)
-            mDatas[index.row()].checked = !mDatas[index.row()].checked;
+        if ( idx.column() == 0){
+            mDatas[idx.row()].checked = !mDatas[idx.row()].checked;
+            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
+            emit checkedCountChanged(checkedCount());
+        }
+
     }
 
 
     if (role == Qt::EditRole)
     {
-        if (index.column() == PROGRESS_COL)
+        if (idx.column() == PROGRESS_COL)
         {
 
-            mDatas[index.row()].progress = value.toFloat();
-            emit dataChanged(index,index);
+            mDatas[idx.row()].progress = value.toFloat();
+            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
+
 
 
         }
@@ -75,6 +100,30 @@ bool FileModel::setData(const QModelIndex &index, const QVariant &value, int rol
     }
 
     return true;
+}
+
+QVariant FileModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if ( orientation == Qt::Horizontal)
+    {
+        if ( role == Qt::DisplayRole)
+        {
+            if (section == EXT_COL)
+                return QString(tr("Type"));
+            if (section == BARCODE_COL)
+                return QString(tr("Barcode"));
+            if (section == SAMPLE_COL)
+                return QString(tr("Sample"));
+            if (section == PROGRESS_COL)
+                return QString(tr("Download"));
+
+
+        }
+
+
+
+    }
+    return QVariant();
 }
 
 Qt::ItemFlags FileModel::flags(const QModelIndex &index) const
@@ -104,6 +153,18 @@ void FileModel::clearProgress()
 int FileModel::count() const
 {
     return mDatas.size();
+}
+
+int FileModel::checkedCount() const
+{
+    int total = 0;
+    foreach (FileItem item, mDatas)
+    {
+        if (item.checked)
+            total++;
+    }
+
+    return total;
 }
 
 FileItem &FileModel::item(int row)

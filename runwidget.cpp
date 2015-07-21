@@ -18,6 +18,9 @@ RunWidget::RunWidget(QWidget *parent) : QWidget(parent)
     mView->setSelectionBehavior(QAbstractItemView::SelectRows);
     mView->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    mPrevButton->setIcon(QIcon(":/icons/resultset_previous.png"));
+    mNextButton->setIcon(QIcon(":/icons/resultset_next.png"));
+
 
     mFilter->setPlaceholderText("Filter...");
     QHBoxLayout * hLayout = new QHBoxLayout;
@@ -36,7 +39,6 @@ RunWidget::RunWidget(QWidget *parent) : QWidget(parent)
 
     setLayout(vLayout);
 
-    mModel->load();
 
     connect(mPrevButton,SIGNAL(clicked(bool)),mModel,SLOT(prevPage()));
     connect(mNextButton,SIGNAL(clicked(bool)),mModel,SLOT(nextPage()));
@@ -45,6 +47,13 @@ RunWidget::RunWidget(QWidget *parent) : QWidget(parent)
 
 
 }
+
+void RunWidget::load()
+{
+ mModel->load();
+}
+
+
 
 void RunWidget::viewClicked(const QModelIndex &index)
 {

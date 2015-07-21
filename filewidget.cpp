@@ -29,7 +29,7 @@ FileWidget::FileWidget(QWidget *parent) : QWidget(parent)
 
 
     connect(mView,SIGNAL(clicked(QModelIndex)),this,SLOT(viewClicked(QModelIndex)));
-
+    connect(mModel,SIGNAL(checkedCountChanged(int)),this,SIGNAL(checkedCountChanged(int)));
 
 }
 
@@ -98,6 +98,8 @@ void FileWidget::downloadProgress(qint64 bytes, qint64 total)
         float percent = float(bytes) / float(total) * 100.0;
         mModel->setData(pIndex, percent);
 
+        if ( percent == 100)
+            mModel->setData(mModel->index(pIndex.row(),0), false, Qt::CheckStateRole);
 
 
 

@@ -8,8 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    TorrentServerManager::i()->setServer("10.67.70.16");
-    TorrentServerManager::i()->setUser("ionadmin","ionadmin");
 
 
 
@@ -50,14 +48,34 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(mainWidget);
 
-    connect(mRunWidget,SIGNAL(clicked(int)),mFileWidget,SLOT(load(int)));
-    connect(mDLAllButton, SIGNAL(clicked()),mFileWidget, SLOT(downloadAll()));
-    connect(mDLButton, SIGNAL(clicked()),mFileWidget, SLOT(download()));
-    connect(mCancelButton,SIGNAL(clicked()),mFileWidget,SLOT(cancelDownload()));
-
+connect(mRunWidget,SIGNAL(clicked(int)),mFileWidget,SLOT(load(int)));
+connect(mDLAllButton, SIGNAL(clicked()),mFileWidget, SLOT(downloadAll()));
+connect(mDLButton, SIGNAL(clicked()),mFileWidget, SLOT(download()));
+connect(mCancelButton,SIGNAL(clicked()),mFileWidget,SLOT(cancelDownload()));
+connect(mConnectBar,SIGNAL(connectClicked()),this,SLOT(connectToServer()));
+connect(mFileWidget,SIGNAL(checkedCountChanged(int)),this,SLOT(setCheckedCount(int)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::connectToServer()
+{
+    TorrentServerManager::i()->setServer(mConnectBar->host());
+    TorrentServerManager::i()->setUser(mConnectBar->user(),mConnectBar->pass());
+
+    qDebug()<<"connect";
+
+    mRunWidget->load();
+
+}
+
+void MainWindow::setCheckedCount(int count)
+{
+
+    mDLAllButton->setText(QString("Download %1").arg(count));
+
+}
+

@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/bullet_valid.png</file>
+        <file>icons/connect.png</file>
+        <file>icons/cross.png</file>
+        <file>icons/disconnect.png</file>
+        <file>icons/file_start_workflow.png</file>
+        <file>icons/progressbar.png</file>
+        <file>icons/resultset_next.png</file>
+        <file>icons/resultset_previous.png</file>
+        <file>icons/save_close.png</file>
+        <file>icons/server_connect.png</file>
+        <file>icons/folder.png</file>
+        <file>icons/barcode_2d.png</file>
+        <file>icons/user_nude.png</file>
+    </qresource>
+</RCC>

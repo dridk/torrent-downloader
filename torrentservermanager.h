@@ -14,6 +14,7 @@ public :
      void setUser(const QString& username, const QString& password);
 
 
+
      QNetworkReply * getResultList(int page=0);
      QNetworkReply * getResult(int resultId);
 

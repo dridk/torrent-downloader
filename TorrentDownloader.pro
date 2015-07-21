@@ -38,3 +38,6 @@ HEADERS  += mainwindow.h \
     downloader.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    icons.qrc

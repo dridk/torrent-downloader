@@ -25,6 +25,10 @@ protected slots:
 
     void downloadProgress(qint64 bytes,qint64 total);
 
+signals:
+    void checkedCountChanged(int count);
+
+
 
 private:
 
