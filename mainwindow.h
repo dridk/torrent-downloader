@@ -3,10 +3,12 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
+#include <QToolBar>
 #include "torrentservermanager.h"
 #include "connectbar.h"
 #include "runwidget.h"
 #include "filewidget.h"
+#include "downloadwidget.h"
 namespace Ui {
 class MainWindow;
 }
@@ -23,15 +25,21 @@ public slots:
     void connectToServer();
     void setCheckedCount(int count);
 
+    void showDownloadDialog();
+
+    void startDownload();
+
 private:
     Ui::MainWindow *ui;
     ConnectBar * mConnectBar;
     RunWidget * mRunWidget;
     FileWidget * mFileWidget;
+    DownloadWidget * mDownloadWidget;
 
     QPushButton * mCancelButton;
     QPushButton * mDLButton;
-    QPushButton * mDLAllButton;
+
+    QToolBar * mMainToolBar;
 
 
 

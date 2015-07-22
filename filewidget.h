@@ -5,13 +5,15 @@
 #include <QtWidgets>
 #include <QSignalMapper>
 #include "filemodel.h"
-#include "fileitemdelegate.h"
+#include "downloaddelegate.h"
 #include "downloader.h"
 class FileWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit FileWidget(QWidget *parent = 0);
+
+    FileModel * model();
 
 public slots:
     void load(int runId);
@@ -34,7 +36,7 @@ private:
 
     QTableView * mView;
     FileModel * mModel;
-    FileItemDelegate * mDelegate;
+    DownloadDelegate * mDelegate;
     Downloader * mDownloader;
 
     QMap<QNetworkReply*, QModelIndex > mProgressMap;

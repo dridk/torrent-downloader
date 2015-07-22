@@ -61,17 +61,28 @@ QNetworkReply *TorrentServerManager::getResult(int resultId)
     return get(request);
 }
 
-QNetworkReply *TorrentServerManager::getFile(const QString& path)
+QNetworkReply *TorrentServerManager::getFile(const QUrl& url)
 {
-    mUrl.setQuery(QUrlQuery());
-    mUrl.setPath(path);
-    qDebug()<<Q_FUNC_INFO<< mUrl;
+//    mUrl.setQuery(QUrlQuery());
+//    mUrl.setPath(path);
+
+    qDebug()<<Q_FUNC_INFO<< url;
 
 
-    return get(QNetworkRequest(mUrl));
+    return get(QNetworkRequest(url));
 
 
 }
+
+QUrl TorrentServerManager::fromPath(const QString &path)
+{
+    mUrl.setQuery(QUrlQuery());
+    mUrl.setPath(path);
+
+    return mUrl;
+}
+
+
 
 TorrentServerManager::TorrentServerManager(QObject *parent)
     :QNetworkAccessManager(parent)

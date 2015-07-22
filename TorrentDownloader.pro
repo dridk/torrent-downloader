@@ -22,8 +22,10 @@ SOURCES += main.cpp\
     connectbar.cpp \
     runwidget.cpp \
     filewidget.cpp \
-    fileitemdelegate.cpp \
-    downloader.cpp
+    downloader.cpp \
+    downloadwidget.cpp \
+    downloadmodel.cpp \
+    downloaddelegate.cpp
 
 HEADERS  += mainwindow.h \
     runmodel.h \
@@ -34,8 +36,10 @@ HEADERS  += mainwindow.h \
     connectbar.h \
     runwidget.h \
     filewidget.h \
-    fileitemdelegate.h \
-    downloader.h
+    downloader.h \
+    downloadwidget.h \
+    downloadmodel.h \
+    downloaddelegate.h
 
 FORMS    += mainwindow.ui
 

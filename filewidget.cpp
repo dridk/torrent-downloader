@@ -5,11 +5,11 @@ FileWidget::FileWidget(QWidget *parent) : QWidget(parent)
 
     mModel = new FileModel;
     mView  = new QTableView;
-    mDelegate = new FileItemDelegate;
+    //    mDelegate = new FileItemDelegate;
     mDownloader = new Downloader;
 
     mView->setModel(mModel);
-    mView->setItemDelegate(mDelegate);
+    // mView->setItemDelegate(mDelegate);
     mView->verticalHeader()->hide();
     mView->setEditTriggers(QAbstractItemView::CurrentChanged);
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
@@ -33,6 +33,11 @@ FileWidget::FileWidget(QWidget *parent) : QWidget(parent)
 
 }
 
+FileModel *FileWidget::model()
+{
+    return mModel;
+}
+
 void FileWidget::load(int runId)
 {
     mModel->load(runId);
@@ -49,19 +54,19 @@ void FileWidget::download()
 void FileWidget::downloadAll()
 {
 
-    for (int row = 0; row < mModel->count(); ++row)
-    {
-        if ( mModel->item(row).checked) {
-            QNetworkReply * reply = mDownloader->add(mModel->item(row).link);
+    //    for (int row = 0; row < mModel->count(); ++row)
+    //    {
+    //        if ( mModel->item(row).checked) {
+    //            QNetworkReply * reply = mDownloader->add(mModel->item(row).link);
 
-            QModelIndex progressIndex = mModel->index(row, FileModel::PROGRESS_COL);
-            mapReplyToItem(reply, progressIndex);
-
-
-        }
+    //            QModelIndex progressIndex = mModel->index(row, FileModel::PROGRESS_COL);
+    //            mapReplyToItem(reply, progressIndex);
 
 
-    }
+    //        }
+
+
+    //    }
 
 
 
@@ -70,9 +75,9 @@ void FileWidget::downloadAll()
 void FileWidget::cancelDownload()
 {
 
-    mDownloader->abort();
-    mProgressMap.clear();
-    mModel->clearProgress();
+    //    mDownloader->abort();
+    //    mProgressMap.clear();
+    //    mModel->clearProgress();
 
 
 }
@@ -84,26 +89,26 @@ void FileWidget::viewClicked(const QModelIndex &index)
 
 void FileWidget::mapReplyToItem(QNetworkReply *reply, const QModelIndex &index)
 {
-    mProgressMap.insert(reply,index);
-    connect(reply,SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
+    //    mProgressMap.insert(reply,index);
+    //    connect(reply,SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
 }
 
 void FileWidget::downloadProgress(qint64 bytes, qint64 total)
 {
-    QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
+    //    QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
 
-    if (mProgressMap.contains(reply))
-    {
-        QModelIndex pIndex = mProgressMap.value(reply);
-        float percent = float(bytes) / float(total) * 100.0;
-        mModel->setData(pIndex, percent);
+    //    if (mProgressMap.contains(reply))
+    //    {
+    //        QModelIndex pIndex = mProgressMap.value(reply);
+    //        float percent = float(bytes) / float(total) * 100.0;
+    //        mModel->setData(pIndex, percent);
 
-        if ( percent == 100)
-            mModel->setData(mModel->index(pIndex.row(),0), false, Qt::CheckStateRole);
+    //        if ( percent == 100)
+    //            mModel->setData(mModel->index(pIndex.row(),0), false, Qt::CheckStateRole);
 
 
 
-    }
+    //    }
 
 
 }

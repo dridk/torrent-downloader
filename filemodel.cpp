@@ -16,7 +16,7 @@ int FileModel::rowCount(const QModelIndex &parent) const
 
 int FileModel::columnCount(const QModelIndex &parent) const
 {
-    return 4;
+    return 3;
 }
 
 QVariant FileModel::data(const QModelIndex &index, int role) const
@@ -38,8 +38,7 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
         if (index.column() == SAMPLE_COL)
             return mDatas.at(index.row()).sample;
 
-        if (index.column() == PROGRESS_COL)
-            return mDatas.at(index.row()).progress;
+
     }
 
     if (role == Qt::DecorationRole)
@@ -84,21 +83,6 @@ bool FileModel::setData(const QModelIndex &idx, const QVariant &value, int role)
 
     }
 
-
-    if (role == Qt::EditRole)
-    {
-        if (idx.column() == PROGRESS_COL)
-        {
-
-            mDatas[idx.row()].progress = value.toFloat();
-            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
-
-
-
-        }
-
-    }
-
     return true;
 }
 
@@ -114,10 +98,6 @@ QVariant FileModel::headerData(int section, Qt::Orientation orientation, int rol
                 return QString(tr("Barcode"));
             if (section == SAMPLE_COL)
                 return QString(tr("Sample"));
-            if (section == PROGRESS_COL)
-                return QString(tr("Download"));
-
-
         }
 
 
@@ -157,19 +137,26 @@ int FileModel::count() const
 
 int FileModel::checkedCount() const
 {
-    int total = 0;
-    foreach (FileItem item, mDatas)
-    {
-        if (item.checked)
-            total++;
-    }
+    return checkedItems().count();
 
-    return total;
 }
 
 FileItem &FileModel::item(int row)
 {
     return mDatas[row];
+}
+
+QList<FileItem> FileModel::checkedItems() const
+{
+    QList<FileItem> list;
+
+    foreach (FileItem item, mDatas)
+    {
+        if (item.checked)
+            list.append(item);
+    }
+
+    return list;
 }
 
 void FileModel::load(int resultId)
@@ -213,12 +200,12 @@ void FileModel::loadded()
             item.barcode = value.toObject().value("barcode_name").toString();
             item.sample  = value.toObject().value("sample").toString();
             item.checked = false;
-            item.link    = QUrl(value.toObject().value("bam_link").toString());
+            item.url     = TorrentServerManager::i()->fromPath(value.toObject().value("bam_link").toString());
             item.ext     = "bam";
 
 
 
-            if (!item.link.isEmpty())
+            if (!item.url.isEmpty())
                 mDatas.append(item);
 
         }

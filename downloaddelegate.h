@@ -3,14 +3,16 @@
 #include <QItemDelegate>
 #include <QStyledItemDelegate>
 #include <QPushButton>
-#include "filemodel.h"
-class FileItemDelegate : public QStyledItemDelegate
+#include "downloadmodel.h"
+class DownloadDelegate : public QStyledItemDelegate
 {
 public:
-    FileItemDelegate(QObject * parent = 0);
+    DownloadDelegate(QObject * parent = 0);
 
 
 virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const;
+
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 };
 

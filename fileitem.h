@@ -11,7 +11,7 @@ public:
     QString ext;
     QString barcode;
     QString sample;
-    QUrl link;
+    QUrl url;
     bool checked;
     float progress;
 

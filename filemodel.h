@@ -9,12 +9,12 @@
 class FileModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
     enum {
         EXT_COL = 0,
         BARCODE_COL = 1,
         SAMPLE_COL = 2,
-        PROGRESS_COL = 3
     };
     FileModel(QObject * parent =0);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -29,6 +29,7 @@ public:
     int count() const;
     int checkedCount() const;
     FileItem& item(int row) ;
+    QList<FileItem> checkedItems() const;
 
 public slots:
     void load(int resultId);

@@ -18,8 +18,10 @@ public :
      QNetworkReply * getResultList(int page=0);
      QNetworkReply * getResult(int resultId);
 
-     QNetworkReply * getFile(const QString& path);
+     QNetworkReply * getFile(const QUrl& url);
 
+
+     QUrl fromPath(const QString& path);
 
 
 
