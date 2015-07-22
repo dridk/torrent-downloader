@@ -78,7 +78,6 @@ QUrl TorrentServerManager::fromPath(const QString &path)
 {
     mUrl.setQuery(QUrlQuery());
     mUrl.setPath(path);
-
     return mUrl;
 }
 
@@ -86,7 +85,6 @@ QUrl TorrentServerManager::fromPath(const QString &path)
 
 TorrentServerManager::TorrentServerManager(QObject *parent)
     :QNetworkAccessManager(parent)
-
 {
 
 

@@ -164,7 +164,9 @@ void FileModel::load(int resultId)
     if (!mPending) {
         QNetworkReply * reply =  TorrentServerManager::i()->getResult(resultId);
         connect(reply,SIGNAL(finished()),this,SLOT(loadded()));
+        beginResetModel();
         mDatas.clear();
+        endResetModel();
         mPending = true;
     }
 
@@ -173,15 +175,16 @@ void FileModel::load(int resultId)
 void FileModel::loadded()
 {
     qDebug()<<"file received";
-    mDatas.clear();
     beginResetModel();
+    mDatas.clear();
 
 
     QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
 
     QString data = QString::fromUtf8(reply->readAll());
-
+    //--------------------------------------------------------
     // Load BAM / BAI File
+    //--------------------------------------------------------
     QRegularExpression expression("var barcodes_json.+]");
     QRegularExpressionMatch match = expression.match(data);
 
@@ -202,17 +205,28 @@ void FileModel::loadded()
             item.checked = false;
             item.url     = TorrentServerManager::i()->fromPath(value.toObject().value("bam_link").toString());
             item.ext     = "bam";
-
-
-
             if (!item.url.isEmpty())
                 mDatas.append(item);
 
         }
-
-
-
     }
+    //--------------------------------------------------------
+    // Load VCF.GZ / BAI File
+    //--------------------------------------------------------
+     expression.setPattern("vcf.gz");
+     match = expression.match(data);
+
+     qDebug()<<"Match??";
+     qDebug()<<"contains"<<data.contains(expression);
+     qDebug()<<data;
+    if ( match.hasMatch()) {
+
+        qDebug()<<"VCF !!!!";
+    }
+
+
+
+
 
 
 
