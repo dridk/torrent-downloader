@@ -1,5 +1,5 @@
 #include "torrentservermanager.h"
-
+#include <QWebView>
 TorrentServerManager * TorrentServerManager::mInstance = NULL;
 
 
@@ -79,6 +79,17 @@ QUrl TorrentServerManager::fromPath(const QString &path)
     mUrl.setQuery(QUrlQuery());
     mUrl.setPath(path);
     return mUrl;
+}
+
+QUrl TorrentServerManager::resultUrl(int resultId) const
+{
+    QUrl url = mUrl;
+    url.setQuery(QUrlQuery());
+    url.setPath(QString("/report/%1/").arg(resultId));
+    url.setScheme("http");
+
+    return url;
+
 }
 
 

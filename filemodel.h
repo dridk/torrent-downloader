@@ -4,6 +4,9 @@
 #include <QAbstractTableModel>
 #include <QJsonDocument>
 #include <QSignalMapper>
+#include <QWebPage>
+#include <QWebFrame>
+#include <QWebElementCollection>
 #include "torrentservermanager.h"
 #include "fileitem.h"
 class FileModel : public QAbstractTableModel
@@ -33,10 +36,10 @@ public:
 
 public slots:
     void load(int resultId);
+     void loadded();
 
-
-protected slots:
-    void loadded();
+protected:
+     QStringList extractUrl(const QString& html) const;
 
 signals:
     void finished();
@@ -44,7 +47,9 @@ signals:
 
 private:
     QList<FileItem> mDatas;
+    QList<QString> mExtensions;
     bool mPending;
+    QWebPage * mWebPage;
 
 
 

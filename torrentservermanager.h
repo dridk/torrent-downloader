@@ -23,6 +23,7 @@ public :
 
      QUrl fromPath(const QString& path);
 
+     QUrl resultUrl(int resultId) const;
 
 
 private:

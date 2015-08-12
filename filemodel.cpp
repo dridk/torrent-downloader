@@ -1,11 +1,17 @@
 #include "filemodel.h"
 #include <QIcon>
 #include <QFont>
+#include <QWebView>
 FileModel::FileModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
     mPending = false;
+    mWebPage = new QWebPage(this);
 
+    mExtensions.append("bam");
+
+
+//    qDebug()<<extractUrl("<a class=\"btn\" href=\"/output/Home/Auto_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_133_216/download_links/IonXpress_024_R_2015_07_21_12_52_15_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_Auto_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_133.bam\">BAM</a>");
 
 }
 
@@ -161,78 +167,114 @@ QList<FileItem> FileModel::checkedItems() const
 
 void FileModel::load(int resultId)
 {
-    if (!mPending) {
-        QNetworkReply * reply =  TorrentServerManager::i()->getResult(resultId);
-        connect(reply,SIGNAL(finished()),this,SLOT(loadded()));
-        beginResetModel();
-        mDatas.clear();
-        endResetModel();
-        mPending = true;
-    }
+
+    mWebPage->mainFrame()->setUrl(TorrentServerManager::i()->resultUrl(resultId));
+    mWebPage->networkAccessManager()->setCookieJar(TorrentServerManager::i()->cookieJar());
+
+
+    connect(mWebPage,SIGNAL(loadFinished(bool)),this,SLOT(loadded()));
 
 }
 
 void FileModel::loadded()
 {
-    qDebug()<<"file received";
-    beginResetModel();
-    mDatas.clear();
+    qDebug()<<"loaded";
 
 
-    QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
 
-    QString data = QString::fromUtf8(reply->readAll());
-    //--------------------------------------------------------
-    // Load BAM / BAI File
-    //--------------------------------------------------------
-    QRegularExpression expression("var barcodes_json.+]");
-    QRegularExpressionMatch match = expression.match(data);
+    QWebElementCollection bamTable = mWebPage->mainFrame()->findAllElements("table#barcodes tbody");
 
-    if ( match.hasMatch())
+    if (bamTable.count() > 0)
     {
-        QString json = match.captured();
-        json = json.remove(QRegularExpression("var barcodes_json.="));
+        QWebElement table = bamTable.first();
+        qDebug()<<table.toPlainText();
 
-        QJsonParseError error;
-
-        QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
-        qDebug()<<Q_FUNC_INFO<<"bam list size "<<doc.array().size();
-        foreach (QJsonValue value, doc.array())
-        {
-            FileItem item;
-            item.barcode = value.toObject().value("barcode_name").toString();
-            item.sample  = value.toObject().value("sample").toString();
-            item.checked = false;
-            item.url     = TorrentServerManager::i()->fromPath(value.toObject().value("bam_link").toString());
-            item.ext     = "bam";
-            if (!item.url.isEmpty())
-                mDatas.append(item);
-
-        }
-    }
-    //--------------------------------------------------------
-    // Load VCF.GZ / BAI File
-    //--------------------------------------------------------
-     expression.setPattern("vcf.gz");
-     match = expression.match(data);
-
-     qDebug()<<"Match??";
-     qDebug()<<"contains"<<data.contains(expression);
-     qDebug()<<data;
-    if ( match.hasMatch()) {
-
-        qDebug()<<"VCF !!!!";
     }
 
 
 
+//    QString rawData = mWebPage->mainFrame()->toHtml();
+
+//    qDebug()<<rawData.size();
+//   // qDebug()<<mWebPage->mainFrame()->childFrames().at(0)->toHtml();
+
+//    QFile file("c:/temp/raw.html");
+//    file.open(QIODevice::WriteOnly);
+
+//    file.write(mWebPage->mainFrame()->childFrames().at(0)->toHtml().toUtf8());
+
+//    file.close();
+}
+
+QStringList FileModel::extractUrl(const QString &html) const
+{
+    QRegularExpression expression("href=");
+    //    QRegularExpressionMatch match = expression.match(data);
 
 
+    QStringList links;
 
+    return links;
 
-    endResetModel();
-    mPending = false;
-    emit finished();
 
 }
+
+//
+    //    if (!mPending) {
+    //        QNetworkReply * reply =  TorrentServerManager::i()->getResult(resultId);
+    //        connect(reply,SIGNAL(finished()),this,SLOT(bamLoadded()));
+    //        beginResetModel();
+    //        mDatas.clear();
+    //        endResetModel();
+    //        mPending = true;
+    //    }
+//
+
+
+//void FileModel::bamLoadded()
+//{
+//    qDebug()<<"file received";
+//    beginResetModel();
+//    mDatas.clear();
+
+
+//    QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
+
+//    QString data = QString::fromUtf8(reply->readAll());
+//    //--------------------------------------------------------
+//    // Load BAM / BAI File
+//    //--------------------------------------------------------
+//    QRegularExpression expression("var barcodes_json.+]");
+//    QRegularExpressionMatch match = expression.match(data);
+
+//    if ( match.hasMatch())
+//    {
+//        QString json = match.captured();
+//        json = json.remove(QRegularExpression("var barcodes_json.="));
+
+//        QJsonParseError error;
+
+//        QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+//        qDebug()<<Q_FUNC_INFO<<"bam list size "<<doc.array().size();
+//        foreach (QJsonValue value, doc.array())
+//        {
+//            FileItem item;
+//            item.barcode = value.toObject().value("barcode_name").toString();
+//            item.sample  = value.toObject().value("sample").toString();
+//            item.checked = false;
+//            item.url     = TorrentServerManager::i()->fromPath(value.toObject().value("bam_link").toString());
+//            item.ext     = "bam";
+//            if (!item.url.isEmpty())
+//                mDatas.append(item);
+
+//        }
+//    }
+
+
+//    endResetModel();
+//    mPending = false;
+//    emit finished();
+//}
+
+
 
