@@ -7,6 +7,7 @@
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElementCollection>
+#include <QFileInfo>
 #include "torrentservermanager.h"
 #include "fileitem.h"
 class FileModel : public QAbstractTableModel
@@ -39,7 +40,9 @@ public slots:
      void loadded();
 
 protected:
-     QStringList extractUrl(const QString& html) const;
+    void parseBamTable();
+    void parseVcfTable();
+
 
 signals:
     void finished();

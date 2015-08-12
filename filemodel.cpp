@@ -11,7 +11,7 @@ FileModel::FileModel(QObject *parent)
     mExtensions.append("bam");
 
 
-//    qDebug()<<extractUrl("<a class=\"btn\" href=\"/output/Home/Auto_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_133_216/download_links/IonXpress_024_R_2015_07_21_12_52_15_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_Auto_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_133.bam\">BAM</a>");
+    //    qDebug()<<extractUrl("<a class=\"btn\" href=\"/output/Home/Auto_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_133_216/download_links/IonXpress_024_R_2015_07_21_12_52_15_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_Auto_user_GRO-66-2015-07-20-Ampliseq_exome_IC-Caro_133.bam\">BAM</a>");
 
 }
 
@@ -178,56 +178,93 @@ void FileModel::load(int resultId)
 
 void FileModel::loadded()
 {
-    qDebug()<<"loaded";
 
+    beginResetModel();
+    mDatas.clear();
 
+    parseBamTable();
+    parseVcfTable();
 
-    QWebElementCollection bamTable = mWebPage->mainFrame()->findAllElements("table#barcodes tbody");
+    endResetModel();
 
-    if (bamTable.count() > 0)
+}
+
+void FileModel::parseBamTable()
+{
+    //Get barcode table html
+    QWebElement bamTable = mWebPage->mainFrame()->findFirstElement("table#barcodes tbody");
+
+    foreach ( QWebElement tr, bamTable.findAll("tr"))
     {
-        QWebElement table = bamTable.first();
-        qDebug()<<table.toPlainText();
+        FileItem item;
 
+        QWebElementCollection tdCol =  tr.findAll("td");
+
+        item.barcode = tdCol.at(0).toPlainText();
+        item.sample  = tdCol.at(1).toPlainText();
+        item.checked = false;
+
+        foreach (QWebElement href, tr.findAll("td span a.btn"))
+        {
+            QString path = href.attribute("href");
+            item.url     = TorrentServerManager::i()->fromPath(path);
+            item.ext     = href.toPlainText();
+            mDatas.append(item);
+        }
+    }
+}
+
+void FileModel::parseVcfTable()
+{
+    //Find first which frame is the vcf one
+    QWebFrame * vcfFrame = NULL;
+    foreach (QWebFrame * subFrame, mWebPage->mainFrame()->childFrames())
+    {
+
+        if (subFrame->baseUrl().toString().contains("variantCaller_block.html"))
+            vcfFrame = subFrame;
     }
 
+    //If frame exist, start parsing
+    if (vcfFrame)
+    {
+        foreach ( QWebElement tr, vcfFrame->findAllElements("table tr"))
+        {
+            FileItem item;
+            QWebElementCollection td = tr.findAll("td");
 
+            item.barcode = td.at(0).toPlainText();
+            item.sample  = td.at(1).toPlainText();
+            item.checked = false;
 
-//    QString rawData = mWebPage->mainFrame()->toHtml();
+            QUrl linkUrl =  vcfFrame->baseUrl().adjusted(QUrl::RemoveFilename);
 
-//    qDebug()<<rawData.size();
-//   // qDebug()<<mWebPage->mainFrame()->childFrames().at(0)->toHtml();
+            qDebug()<<linkUrl;
 
-//    QFile file("c:/temp/raw.html");
-//    file.open(QIODevice::WriteOnly);
+            foreach (QWebElement href, tr.findAll("td a.btn"))
+            {
 
-//    file.write(mWebPage->mainFrame()->childFrames().at(0)->toHtml().toUtf8());
+                item.url     = QUrl(linkUrl.toString() + href.attribute("href"));
+                item.ext     = href.toPlainText();
 
-//    file.close();
+                qDebug()<<item.url;
+                mDatas.append(item);
+            }
+        }
+    }
 }
 
-QStringList FileModel::extractUrl(const QString &html) const
-{
-    QRegularExpression expression("href=");
-    //    QRegularExpressionMatch match = expression.match(data);
 
-
-    QStringList links;
-
-    return links;
-
-
-}
 
 //
-    //    if (!mPending) {
-    //        QNetworkReply * reply =  TorrentServerManager::i()->getResult(resultId);
-    //        connect(reply,SIGNAL(finished()),this,SLOT(bamLoadded()));
-    //        beginResetModel();
-    //        mDatas.clear();
-    //        endResetModel();
-    //        mPending = true;
-    //    }
+//    if (!mPending) {
+//        QNetworkReply * reply =  TorrentServerManager::i()->getResult(resultId);
+//        connect(reply,SIGNAL(finished()),this,SLOT(bamLoadded()));
+//        beginResetModel();
+//        mDatas.clear();
+//        endResetModel();
+//        mPending = true;
+//    }
 //
 
 
