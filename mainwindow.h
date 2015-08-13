@@ -9,6 +9,7 @@
 #include "runwidget.h"
 #include "filewidget.h"
 #include "downloadwidget.h"
+#include "downloaddialog.h"
 namespace Ui {
 class MainWindow;
 }

@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(mRunWidget,SIGNAL(clicked(int)),mFileWidget,SLOT(load(int)));
     connect(mDLButton, SIGNAL(clicked()),this, SLOT(startDownload()));
-//    connect(mCancelButton,SIGNAL(clicked()),this,SLOT(cancelDownload()));
+    //    connect(mCancelButton,SIGNAL(clicked()),this,SLOT(cancelDownload()));
     connect(mConnectBar,SIGNAL(connectClicked()),this,SLOT(connectToServer()));
     connect(mFileWidget,SIGNAL(checkedCountChanged(int)),this,SLOT(setCheckedCount(int)));
 
@@ -73,7 +73,7 @@ void MainWindow::connectToServer()
 void MainWindow::setCheckedCount(int count)
 {
 
-//    mDLAllButton->setText(QString("Download %1").arg(count));
+    //    mDLAllButton->setText(QString("Download %1").arg(count));
 
 }
 
@@ -82,9 +82,9 @@ void MainWindow::showDownloadDialog()
 
     mDownloadWidget->show();
 
-//    mDownloadWidget->model()->add(QUrl("http://10.67.70.16/output/Home/Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122_134/download_links/IonXpress_020_R_2013_06_07_10_45_38_user_OUE-96-20131128_ACTN1_AmpliSeq_Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122.bam"));
-//    mDownloadWidget->model()->add(QUrl("http://10.67.70.16/output/Home/Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122_134/download_links/IonXpress_020_R_2013_06_07_10_45_38_user_OUE-96-20131128_ACTN1_AmpliSeq_Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122.bam"));
-//    mDownloadWidget->model()->add(QUrl("http://10.67.70.16/output/Home/Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122_134/download_links/IonXpress_020_R_2013_06_07_10_45_38_user_OUE-96-20131128_ACTN1_AmpliSeq_Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122.bam"));
+    //    mDownloadWidget->model()->add(QUrl("http://10.67.70.16/output/Home/Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122_134/download_links/IonXpress_020_R_2013_06_07_10_45_38_user_OUE-96-20131128_ACTN1_AmpliSeq_Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122.bam"));
+    //    mDownloadWidget->model()->add(QUrl("http://10.67.70.16/output/Home/Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122_134/download_links/IonXpress_020_R_2013_06_07_10_45_38_user_OUE-96-20131128_ACTN1_AmpliSeq_Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122.bam"));
+    //    mDownloadWidget->model()->add(QUrl("http://10.67.70.16/output/Home/Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122_134/download_links/IonXpress_020_R_2013_06_07_10_45_38_user_OUE-96-20131128_ACTN1_AmpliSeq_Auto_user_OUE-96-20131128_ACTN1_AmpliSeq_122.bam"));
 
 
 }
@@ -93,11 +93,31 @@ void MainWindow::startDownload()
 {
 
 
-    foreach (FileItem item, mFileWidget->model()->checkedItems())
+    QList<FileItem> items = mFileWidget->selectedItems();
+
+    if (items.isEmpty())
+        return;
+
+
+    DownloadDialog dialog(this);
+    dialog.setPreview(items.first());
+
+
+
+    if (dialog.exec() == QDialog::Accepted)
     {
 
-            mDownloadWidget->model()->add(item.url);
+        foreach (FileItem item, items)
+        {
+
+            mDownloadWidget->model()->setDestination(dialog.destination());
+            mDownloadWidget->model()->add(item.url, dialog.fromSchema(item));
+
+        }
+
     }
+
+    mFileWidget->view()->clearSelection();
 
 
 

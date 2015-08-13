@@ -13,5 +13,7 @@
         <file>icons/folder.png</file>
         <file>icons/barcode_2d.png</file>
         <file>icons/user_nude.png</file>
+        <file>icons/filter.png</file>
+        <file>icons/mark_to_download.png</file>
     </qresource>
 </RCC>

@@ -33,7 +33,10 @@ public:
     int count() const;
     int checkedCount() const;
     FileItem& item(int row) ;
+
     QList<FileItem> checkedItems() const;
+
+    static QIcon extIcon(const QString& ext);
 
 public slots:
     void load(int resultId);

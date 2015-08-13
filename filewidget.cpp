@@ -5,37 +5,66 @@ FileWidget::FileWidget(QWidget *parent) : QWidget(parent)
 
     mModel = new FileModel;
     mView  = new QTableView;
-    //    mDelegate = new FileItemDelegate;
     mDownloader = new Downloader;
+    mProxyModel = new QSortFilterProxyModel;
+    mFilterEdit = new QLineEdit;
 
-    mView->setModel(mModel);
-    // mView->setItemDelegate(mDelegate);
+    mProxyModel->setSourceModel(mModel);
+    mView->setModel(mProxyModel);
+
     mView->verticalHeader()->hide();
     mView->setEditTriggers(QAbstractItemView::CurrentChanged);
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     mView->horizontalHeader()->setStretchLastSection(true);
     mView->setAlternatingRowColors(true);
     mView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    mView->setSelectionMode(QAbstractItemView::SingleSelection);
+    mView->setSelectionMode(QAbstractItemView::MultiSelection);
+
+    mProxyModel->setFilterKeyColumn(0);
 
 
 
     QVBoxLayout * vLayout = new QVBoxLayout;
     vLayout->setContentsMargins(0,0,0,0);
 
+    vLayout->addWidget(mFilterEdit);
     vLayout->addWidget(mView);
 
     setLayout(vLayout);
+    setupFilterMenu();
 
 
     connect(mView,SIGNAL(clicked(QModelIndex)),this,SLOT(viewClicked(QModelIndex)));
     connect(mModel,SIGNAL(checkedCountChanged(int)),this,SIGNAL(checkedCountChanged(int)));
+
+    connect(mFilterEdit,SIGNAL(textChanged(QString)),mProxyModel, SLOT(setFilterRegExp(QString)));
 
 }
 
 FileModel *FileWidget::model()
 {
     return mModel;
+}
+
+QTableView *FileWidget::view()
+{
+    return mView;
+}
+
+QList<FileItem> FileWidget::selectedItems()
+{
+    QList<FileItem> items;
+
+    foreach ( QModelIndex index, mView->selectionModel()->selectedRows()) {
+
+        items.append(mModel->item(mProxyModel->mapToSource(index).row()));
+
+    }
+
+    return items;
+
+
+
 }
 
 void FileWidget::load(int runId)
@@ -82,6 +111,7 @@ void FileWidget::cancelDownload()
 
 }
 
+
 void FileWidget::viewClicked(const QModelIndex &index)
 {
 
@@ -109,6 +139,34 @@ void FileWidget::downloadProgress(qint64 bytes, qint64 total)
 
 
     //    }
+
+
+}
+
+void FileWidget::setupFilterMenu()
+{
+
+    mFilterEdit->setPlaceholderText("Filter ...");
+    QAction * filterAction = mFilterEdit->addAction(QIcon(":/icons/filter.png"),QLineEdit::TrailingPosition);
+
+
+    QMenu * filterMenu = new QMenu(this);
+
+    QActionGroup * actionGroup = new QActionGroup(this);
+    actionGroup->addAction("By type")->setCheckable(true);
+    actionGroup->addAction("By barcode")->setCheckable(true);
+    actionGroup->addAction("By name")->setCheckable(true);
+
+    actionGroup->setExclusive(true);
+
+    actionGroup->actions().first()->setChecked(true);
+
+    filterMenu->addActions(actionGroup->actions());
+
+    filterAction->setCheckable(true);
+
+    filterAction->setMenu(filterMenu);
+
 
 
 }

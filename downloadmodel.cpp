@@ -53,28 +53,33 @@ QVariant DownloadModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QNetworkReply *DownloadModel::add(const QUrl &url)
+void DownloadModel::setDestination(const QString &dir)
+{
+    qDebug()<<Q_FUNC_INFO<<"Set destination "<<dir;
+    mDest = QDir(dir);
+}
+
+QNetworkReply *DownloadModel::add(const QUrl &url, const QString& name)
 {
 
     QNetworkReply * reply  = NULL;
     QFileInfo info(url.path());
+    QString newName = name.isEmpty() ? info.fileName() : name;
 
-    QFile * file = new QFile(mDest.absoluteFilePath(info.baseName()));
+    QFile * file = new QFile(mDest.absoluteFilePath(newName));
+
 
     if ( file->open(QIODevice::WriteOnly|QIODevice::Append)) {
 
-        qDebug()<<"salut";
-
         reply = TorrentServerManager::i()->getFile(url);
-        qDebug()<<reply;
 
         DownloadItem * item = new DownloadItem;
-        item->reply = reply;
-        item->basename = info.baseName();
-        item->url = url;
-        item->file = file;
+        item->reply    = reply;
+        item->basename = newName;
+        item->url      = url;
+        item->file     = file;
         item->progress = 0;
-        item->status = "Downloading";
+        item->status   = "Downloading";
 
         beginResetModel();
         mItems.append(item);
@@ -84,7 +89,6 @@ QNetworkReply *DownloadModel::add(const QUrl &url)
         connect(reply,SIGNAL(readyRead()),this,SLOT(write()));
         connect(reply,SIGNAL(finished()),this,SLOT(finished()));
         connect(reply,SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
-
     }
 
     else

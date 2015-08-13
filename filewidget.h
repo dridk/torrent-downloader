@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QtWidgets>
 #include <QSignalMapper>
+#include <QSortFilterProxyModel>
+#include <QMenu>
 #include "filemodel.h"
 #include "downloaddelegate.h"
 #include "downloader.h"
@@ -14,6 +16,10 @@ public:
     explicit FileWidget(QWidget *parent = 0);
 
     FileModel * model();
+    QTableView * view();
+
+
+    QList<FileItem> selectedItems();
 
 public slots:
     void load(int runId);
@@ -22,6 +28,8 @@ public slots:
     void cancelDownload();
 
 protected slots:
+
+
     void viewClicked(const QModelIndex& index);
     void mapReplyToItem(QNetworkReply * reply, const QModelIndex& index);
 
@@ -31,14 +39,17 @@ signals:
     void checkedCountChanged(int count);
 
 
+protected:
+    void setupFilterMenu();
 
 private:
 
     QTableView * mView;
     FileModel * mModel;
     DownloadDelegate * mDelegate;
+    QSortFilterProxyModel * mProxyModel;
     Downloader * mDownloader;
-
+    QLineEdit * mFilterEdit;
     QMap<QNetworkReply*, QModelIndex > mProgressMap;
 
 

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     downloader.cpp \
     downloadwidget.cpp \
     downloadmodel.cpp \
-    downloaddelegate.cpp
+    downloaddelegate.cpp \
+    downloaddialog.cpp
 
 HEADERS  += mainwindow.h \
     runmodel.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     downloader.h \
     downloadwidget.h \
     downloadmodel.h \
-    downloaddelegate.h
+    downloaddelegate.h \
+    downloaddialog.h
 
 FORMS    += mainwindow.ui
 

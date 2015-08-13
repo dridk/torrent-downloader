@@ -2,6 +2,7 @@
 #include <QIcon>
 #include <QFont>
 #include <QWebView>
+#include <QFontMetrics>
 FileModel::FileModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
@@ -54,12 +55,9 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
 
         if (index.column() == SAMPLE_COL)
             return QIcon(":/icons/user_nude.png");
-    }
 
-    if ( role == Qt::CheckStateRole)
-    {
-        if (index.column() == 0)
-            return mDatas.at(index.row()).checked;
+        if ( index.column() == EXT_COL)
+            return QIcon(":/icons/mark_to_download.png");
     }
 
 
@@ -77,17 +75,17 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
 
 bool FileModel::setData(const QModelIndex &idx, const QVariant &value, int role)
 {
-    if (!idx.isValid())
-        return false;
-    if (role == Qt::CheckStateRole)
-    {
-        if ( idx.column() == 0){
-            mDatas[idx.row()].checked = !mDatas[idx.row()].checked;
-            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
-            emit checkedCountChanged(checkedCount());
-        }
+//    if (!idx.isValid())
+//        return false;
+//    if (role == Qt::CheckStateRole)
+//    {
+//        if ( idx.column() == 0){
+//            mDatas[idx.row()].checked = !mDatas[idx.row()].checked;
+//            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
+//            emit checkedCountChanged(checkedCount());
+//        }
 
-    }
+//    }
 
     return true;
 }
@@ -105,9 +103,6 @@ QVariant FileModel::headerData(int section, Qt::Orientation orientation, int rol
             if (section == SAMPLE_COL)
                 return QString(tr("Sample"));
         }
-
-
-
     }
     return QVariant();
 }
@@ -115,10 +110,7 @@ QVariant FileModel::headerData(int section, Qt::Orientation orientation, int rol
 Qt::ItemFlags FileModel::flags(const QModelIndex &index) const
 {
 
-    if (index.column() == 0)
-        return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsSelectable;
-
-    return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable;
+    return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
 
 }
 
@@ -129,7 +121,6 @@ void FileModel::clearProgress()
     for (int i=0; i<count(); ++i){
         mDatas[i].progress = 0;
         mDatas[i].checked = false;
-
     }
 
     endResetModel();
@@ -163,6 +154,26 @@ QList<FileItem> FileModel::checkedItems() const
     }
 
     return list;
+}
+
+QIcon FileModel::extIcon(const QString &ext)
+{
+    QPainter painter;
+    QFontMetrics metrics(painter.font());
+
+    int w = metrics.width(ext);
+    int h = metrics.height();
+
+    QPixmap pix(w+10, h+10);
+    pix.fill(Qt::blue);
+    painter.begin(&pix);
+    painter.drawRect(0,0,w,h);
+
+    painter.end();
+
+    return QIcon(pix);
+
+
 }
 
 void FileModel::load(int resultId)

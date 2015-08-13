@@ -36,7 +36,9 @@ public:
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
 
-    QNetworkReply * add(const QUrl& path);
+    void setDestination(const QString& dir);
+
+    QNetworkReply * add(const QUrl& path, const QString& name = QString());
 public slots:
     void clear();
     void cancel(const QModelIndex& index);
