@@ -213,27 +213,59 @@ void FileModel::loadded()
 
 void FileModel::parseBamTable()
 {
-    //Get barcode table html
-    QWebElement bamTable = mWebPage->mainFrame()->findFirstElement("table#barcodes tbody");
 
-    foreach ( QWebElement tr, bamTable.findAll("tr"))
-    {
-        FileItem item;
+    QString data =  mWebPage->mainFrame()->toHtml();
 
-        QWebElementCollection tdCol =  tr.findAll("td");
+    QRegularExpression expression("var barcodes_json.+]");
+      QRegularExpressionMatch match = expression.match(data);
 
-        item.barcode = tdCol.at(0).toPlainText();
-        item.sample  = tdCol.at(1).toPlainText();
-        item.checked = false;
+      if ( match.hasMatch())
+      {
+          QString json = match.captured();
+          json = json.remove(QRegularExpression("var barcodes_json.="));
 
-        foreach (QWebElement href, tr.findAll("td span a.btn"))
-        {
-            QString path = href.attribute("href");
-            item.url     = TorrentServerManager::i()->fromPath(path);
-            item.ext     = href.toPlainText();
-            mDatas.append(item);
-        }
-    }
+          QJsonParseError error;
+
+          QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+          qDebug()<<Q_FUNC_INFO<<"bam list size "<<doc.array().size();
+          foreach (QJsonValue value, doc.array())
+          {
+              FileItem item;
+              item.barcode = value.toObject().value("barcode_name").toString();
+              item.sample  = value.toObject().value("sample").toString();
+              item.checked = false;
+              item.url     = TorrentServerManager::i()->fromPath(value.toObject().value("bam_link").toString());
+              item.ext     = "BAM";
+              if (!item.url.isEmpty())
+                  mDatas.append(item);
+
+          }
+      }
+
+
+
+
+//    //Get barcode table html
+//    QWebElement bamTable = mWebPage->mainFrame()->findFirstElement("table#barcodes tbody");
+
+//    foreach ( QWebElement tr, bamTable.findAll("tr"))
+//    {
+//        FileItem item;
+
+//        QWebElementCollection tdCol =  tr.findAll("td");
+
+//        item.barcode = tdCol.at(0).toPlainText();
+//        item.sample  = tdCol.at(1).toPlainText();
+//        item.checked = false;
+
+//        foreach (QWebElement href, tr.findAll("td span a.btn"))
+//        {
+//            QString path = href.attribute("href");
+//            item.url     = TorrentServerManager::i()->fromPath(path);
+//            item.ext     = href.toPlainText();
+//            mDatas.append(item);
+//        }
+//    }
 }
 
 void FileModel::parseVcfTable()
