@@ -24,11 +24,12 @@ public:
 
 public slots:
     void connectToServer();
-    void setCheckedCount(int count);
-
-    void showDownloadDialog();
-
     void startDownload();
+    void showAbout();
+    void showError(const QString& message);
+
+protected slots:
+    void updateFileCount();
 
 private:
     Ui::MainWindow *ui;
@@ -37,10 +38,10 @@ private:
     FileWidget * mFileWidget;
     DownloadWidget * mDownloadWidget;
 
-    QPushButton * mCancelButton;
+    QPushButton * mClearButton;
+    QPushButton * mShowListButton;
     QPushButton * mDLButton;
 
-    QToolBar * mMainToolBar;
 
 
 

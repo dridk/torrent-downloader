@@ -6,6 +6,7 @@ RunModel::RunModel(QObject * parent)
 {
 
     mOffset = 0;
+    mIsLoading=false;
     QStringList statusList;
     statusList<<"Calibration"<<"Signal Processing"<<"Complete";
 }
@@ -91,26 +92,39 @@ const RunItem &RunModel::item(const QModelIndex &index)
 
 }
 
-void RunModel::load()
+bool RunModel::isLoading()
 {
+    return mIsLoading;
+}
 
-    mDatas.clear();
+void RunModel::setLoading(bool active)
+{
+    mIsLoading = active;
+    emit loadingChanged(active);
+}
 
+void RunModel::load(const QString& search)
+{
+    if (isLoading())
+        return;
 
-    QNetworkReply * reply =  TorrentServerManager::i()->getResultList(mOffset);
+    mSearch = search;
 
+    setLoading(true);
+    QNetworkReply * reply =  TorrentServerManager::i()->getResultList(mOffset, search);
     connect(reply,SIGNAL(finished()),this,SLOT(loadded()));
 
 
 
 }
 
+
 void RunModel::nextPage()
 {
-    if (mOffset * mLimit < mTotalCount)
+    if (mOffset < mTotalCount)
     {
-        mOffset++;
-        load();
+        mOffset+=20;
+        load(mSearch);
     }
 
 
@@ -118,10 +132,10 @@ void RunModel::nextPage()
 
 void RunModel::prevPage()
 {
-    if ( mOffset > 0)
+    if ( mOffset >= 20)
     {
-        mOffset--;
-        load();
+        mOffset-=20;
+        load(mSearch);
     }
 }
 
@@ -132,6 +146,12 @@ void RunModel::loadded()
 
     qDebug()<<"received";
     QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
+
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        emit error(reply->errorString());
+        return;
+    }
 
 
     QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
@@ -162,6 +182,7 @@ void RunModel::loadded()
     endResetModel();
 
     emit finished();
+    setLoading(false);
 
 
 }

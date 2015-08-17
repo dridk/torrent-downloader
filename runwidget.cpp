@@ -42,15 +42,22 @@ RunWidget::RunWidget(QWidget *parent) : QWidget(parent)
 
     connect(mPrevButton,SIGNAL(clicked(bool)),mModel,SLOT(prevPage()));
     connect(mNextButton,SIGNAL(clicked(bool)),mModel,SLOT(nextPage()));
-
+    connect(mModel,SIGNAL(loadingChanged(bool)),this,SLOT(setDisabled(bool)));
     connect(mView,SIGNAL(clicked(QModelIndex)),this,SLOT(viewClicked(QModelIndex)));
+    connect(mFilter,SIGNAL(returnPressed()),this,SLOT(load()));
 
 
 }
 
+RunModel *RunWidget::model()
+{
+ return mModel;
+}
+
 void RunWidget::load()
 {
- mModel->load();
+
+    mModel->load(mFilter->text());
 }
 
 

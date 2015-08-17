@@ -6,9 +6,9 @@ DownloadWidget::DownloadWidget(QWidget *parent) : QWidget(parent)
     mView = new QListView;
     mModel = new DownloadModel;
     mDelegate = new DownloadDelegate;
-    mCancelButton= new QPushButton(tr("Cancel"));
+    mCancelButton= new QPushButton(tr("Stop selection"));
     mOpenButton = new QPushButton(tr("Open Destination"));
-    mClearButton = new QPushButton(tr("Clear"));
+    mClearButton = new QPushButton(tr("Clear finished"));
     mView->setModel(mModel);
     mView->setItemDelegate(mDelegate);
 
@@ -33,6 +33,8 @@ DownloadWidget::DownloadWidget(QWidget *parent) : QWidget(parent)
     connect(mCancelButton,SIGNAL(clicked(bool)),this,SLOT(cancel()));
     connect(mClearButton,SIGNAL(clicked(bool)),this,SLOT(clear()));
     connect(mOpenButton,SIGNAL(clicked(bool)),this,SLOT(open()));
+
+    setWindowTitle("Download list");
 }
 
 DownloadModel *DownloadWidget::model()

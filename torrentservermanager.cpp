@@ -26,13 +26,20 @@ void TorrentServerManager::setUser(const QString &username, const QString &passw
     mUrl.setPassword(password);
 }
 
-QNetworkReply *TorrentServerManager::getResultList(int page)
+QNetworkReply *TorrentServerManager::getResultList(int page, const QString &search)
 {
+
+    qDebug()<<"PAGE"<<page;
 
     QUrlQuery query;
     query.addQueryItem("format","json");
     query.addQueryItem("offset",QString::number(page));
+    query.addQueryItem("limit","20");
+
     query.addQueryItem("order_by","-timeStamp");
+
+    if (!search.isEmpty())
+        query.addQueryItem("resultsName__icontains", search);
 
     mUrl.setPath("/rundb/api/v1/results/");
     mUrl.setScheme("http");
@@ -63,8 +70,8 @@ QNetworkReply *TorrentServerManager::getResult(int resultId)
 
 QNetworkReply *TorrentServerManager::getFile(const QUrl& url)
 {
-//    mUrl.setQuery(QUrlQuery());
-//    mUrl.setPath(path);
+    //    mUrl.setQuery(QUrlQuery());
+    //    mUrl.setPath(path);
 
     qDebug()<<Q_FUNC_INFO<< url;
 

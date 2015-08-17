@@ -34,9 +34,8 @@ FileWidget::FileWidget(QWidget *parent) : QWidget(parent)
     setupFilterMenu();
 
 
-    connect(mView,SIGNAL(clicked(QModelIndex)),this,SLOT(viewClicked(QModelIndex)));
     connect(mModel,SIGNAL(checkedCountChanged(int)),this,SIGNAL(checkedCountChanged(int)));
-
+    connect(mModel,SIGNAL(loadingChanged(bool)),this,SLOT(setDisabled(bool)));
     connect(mFilterEdit,SIGNAL(textChanged(QString)),mProxyModel, SLOT(setFilterRegExp(QString)));
 
 }
@@ -74,74 +73,15 @@ void FileWidget::load(int runId)
 
 }
 
-void FileWidget::download()
+void FileWidget::filterChanged(QAction *action)
 {
 
-
-}
-
-void FileWidget::downloadAll()
-{
-
-    //    for (int row = 0; row < mModel->count(); ++row)
-    //    {
-    //        if ( mModel->item(row).checked) {
-    //            QNetworkReply * reply = mDownloader->add(mModel->item(row).link);
-
-    //            QModelIndex progressIndex = mModel->index(row, FileModel::PROGRESS_COL);
-    //            mapReplyToItem(reply, progressIndex);
-
-
-    //        }
-
-
-    //    }
+    mProxyModel->setFilterKeyColumn(action->data().toInt());
 
 
 
 }
 
-void FileWidget::cancelDownload()
-{
-
-    //    mDownloader->abort();
-    //    mProgressMap.clear();
-    //    mModel->clearProgress();
-
-
-}
-
-
-void FileWidget::viewClicked(const QModelIndex &index)
-{
-
-}
-
-void FileWidget::mapReplyToItem(QNetworkReply *reply, const QModelIndex &index)
-{
-    //    mProgressMap.insert(reply,index);
-    //    connect(reply,SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
-}
-
-void FileWidget::downloadProgress(qint64 bytes, qint64 total)
-{
-    //    QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
-
-    //    if (mProgressMap.contains(reply))
-    //    {
-    //        QModelIndex pIndex = mProgressMap.value(reply);
-    //        float percent = float(bytes) / float(total) * 100.0;
-    //        mModel->setData(pIndex, percent);
-
-    //        if ( percent == 100)
-    //            mModel->setData(mModel->index(pIndex.row(),0), false, Qt::CheckStateRole);
-
-
-
-    //    }
-
-
-}
 
 void FileWidget::setupFilterMenu()
 {
@@ -153,21 +93,28 @@ void FileWidget::setupFilterMenu()
     QMenu * filterMenu = new QMenu(this);
 
     QActionGroup * actionGroup = new QActionGroup(this);
-    actionGroup->addAction("By type")->setCheckable(true);
-    actionGroup->addAction("By barcode")->setCheckable(true);
-    actionGroup->addAction("By name")->setCheckable(true);
+    QAction *typeAction    = actionGroup->addAction("By type");
+    QAction *barcodeAction = actionGroup->addAction("By barcode");
+    QAction *nameAction    = actionGroup->addAction("By name");
+
+    typeAction->setCheckable(true);
+    barcodeAction->setCheckable(true);
+    nameAction->setCheckable(true);
+
+    typeAction->setData(0);
+    barcodeAction->setData(1);
+    nameAction->setData(2);
 
     actionGroup->setExclusive(true);
-
     actionGroup->actions().first()->setChecked(true);
 
     filterMenu->addActions(actionGroup->actions());
-
     filterAction->setCheckable(true);
-
     filterAction->setMenu(filterMenu);
 
 
+
+    connect(actionGroup,SIGNAL(triggered(QAction*)),this,SLOT(filterChanged(QAction*)));
 
 }
 

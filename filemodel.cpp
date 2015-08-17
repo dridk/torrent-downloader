@@ -6,7 +6,7 @@
 FileModel::FileModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
-    mPending = false;
+    mLoading=false;
     mWebPage = new QWebPage(this);
 
     mExtensions.append("bam");
@@ -75,17 +75,17 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
 
 bool FileModel::setData(const QModelIndex &idx, const QVariant &value, int role)
 {
-//    if (!idx.isValid())
-//        return false;
-//    if (role == Qt::CheckStateRole)
-//    {
-//        if ( idx.column() == 0){
-//            mDatas[idx.row()].checked = !mDatas[idx.row()].checked;
-//            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
-//            emit checkedCountChanged(checkedCount());
-//        }
+    //    if (!idx.isValid())
+    //        return false;
+    //    if (role == Qt::CheckStateRole)
+    //    {
+    //        if ( idx.column() == 0){
+    //            mDatas[idx.row()].checked = !mDatas[idx.row()].checked;
+    //            emit dataChanged(index(idx.row(),0), index(idx.row(), columnCount()));
+    //            emit checkedCountChanged(checkedCount());
+    //        }
 
-//    }
+    //    }
 
     return true;
 }
@@ -143,6 +143,11 @@ FileItem &FileModel::item(int row)
     return mDatas[row];
 }
 
+bool FileModel::isLoading()
+{
+    return mLoading;
+}
+
 QList<FileItem> FileModel::checkedItems() const
 {
     QList<FileItem> list;
@@ -178,7 +183,10 @@ QIcon FileModel::extIcon(const QString &ext)
 
 void FileModel::load(int resultId)
 {
+    if (isLoading())
+        return;
 
+    setLoading(true);
     mWebPage->mainFrame()->setUrl(TorrentServerManager::i()->resultUrl(resultId));
     mWebPage->networkAccessManager()->setCookieJar(TorrentServerManager::i()->cookieJar());
 
@@ -197,6 +205,9 @@ void FileModel::loadded()
     parseVcfTable();
 
     endResetModel();
+
+    setLoading(false);
+
 
 }
 
@@ -250,7 +261,6 @@ void FileModel::parseVcfTable()
 
             QUrl linkUrl =  vcfFrame->baseUrl().adjusted(QUrl::RemoveFilename);
 
-            qDebug()<<linkUrl;
 
             foreach (QWebElement href, tr.findAll("td a.btn"))
             {
@@ -258,71 +268,18 @@ void FileModel::parseVcfTable()
                 item.url     = QUrl(linkUrl.toString() + href.attribute("href"));
                 item.ext     = href.toPlainText();
 
-                qDebug()<<item.url;
                 mDatas.append(item);
             }
         }
     }
 }
 
+void FileModel::setLoading(bool active)
+{
+    mLoading = active;
+    emit loadingChanged(active);
+}
 
-
-//
-//    if (!mPending) {
-//        QNetworkReply * reply =  TorrentServerManager::i()->getResult(resultId);
-//        connect(reply,SIGNAL(finished()),this,SLOT(bamLoadded()));
-//        beginResetModel();
-//        mDatas.clear();
-//        endResetModel();
-//        mPending = true;
-//    }
-//
-
-
-//void FileModel::bamLoadded()
-//{
-//    qDebug()<<"file received";
-//    beginResetModel();
-//    mDatas.clear();
-
-
-//    QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
-
-//    QString data = QString::fromUtf8(reply->readAll());
-//    //--------------------------------------------------------
-//    // Load BAM / BAI File
-//    //--------------------------------------------------------
-//    QRegularExpression expression("var barcodes_json.+]");
-//    QRegularExpressionMatch match = expression.match(data);
-
-//    if ( match.hasMatch())
-//    {
-//        QString json = match.captured();
-//        json = json.remove(QRegularExpression("var barcodes_json.="));
-
-//        QJsonParseError error;
-
-//        QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
-//        qDebug()<<Q_FUNC_INFO<<"bam list size "<<doc.array().size();
-//        foreach (QJsonValue value, doc.array())
-//        {
-//            FileItem item;
-//            item.barcode = value.toObject().value("barcode_name").toString();
-//            item.sample  = value.toObject().value("sample").toString();
-//            item.checked = false;
-//            item.url     = TorrentServerManager::i()->fromPath(value.toObject().value("bam_link").toString());
-//            item.ext     = "bam";
-//            if (!item.url.isEmpty())
-//                mDatas.append(item);
-
-//        }
-//    }
-
-
-//    endResetModel();
-//    mPending = false;
-//    emit finished();
-//}
 
 
 

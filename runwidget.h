@@ -8,6 +8,7 @@ class RunWidget : public QWidget
 public:
     explicit RunWidget(QWidget *parent = 0);
 
+    RunModel * model();
 
 public slots:
     void load();

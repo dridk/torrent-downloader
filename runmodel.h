@@ -26,10 +26,14 @@ public:
 
     const RunItem& item(const QModelIndex& index);
 
+    bool isLoading();
 
+protected:
+    void setLoading(bool active = true);
 
 public slots:
-    void load();
+    void load(const QString& search = QString());
+
     void nextPage();
     void prevPage();
 
@@ -38,12 +42,16 @@ protected slots:
 
 signals:
     void finished();
+    void loadingChanged(bool active);
+    void error(const QString& message);
 
 private:
    QList<RunItem> mDatas;
    int mOffset;
    int mTotalCount;
    int mLimit;
+   bool mIsLoading;
+   QString mSearch;
 
 };
 

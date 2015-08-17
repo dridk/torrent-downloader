@@ -23,17 +23,10 @@ public:
 
 public slots:
     void load(int runId);
-    void download();
-    void downloadAll();
-    void cancelDownload();
+
 
 protected slots:
-
-
-    void viewClicked(const QModelIndex& index);
-    void mapReplyToItem(QNetworkReply * reply, const QModelIndex& index);
-
-    void downloadProgress(qint64 bytes,qint64 total);
+void filterChanged(QAction * action);
 
 signals:
     void checkedCountChanged(int count);

@@ -24,7 +24,7 @@ DownloadDialog::DownloadDialog(QWidget *parent)
 
     setLayout(vLayout);
 
-    resize(400,600);
+    resize(600,500);
 
     mModel->setRootPath(QDir::currentPath());
 

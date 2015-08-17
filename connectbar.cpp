@@ -11,6 +11,7 @@ ConnectBar::ConnectBar(QWidget *parent)
     mHostEdit->setPlaceholderText("Host");
     mUserEdit->setPlaceholderText("Username");
     mPasswordEdit->setPlaceholderText("Password");
+    mPasswordEdit->setEchoMode(QLineEdit::Password);
 
     mHostEdit->setText("10.67.70.16");
     mUserEdit->setText("ionadmin");
@@ -18,10 +19,10 @@ ConnectBar::ConnectBar(QWidget *parent)
 
 
     addWidget(mHostEdit);
-    addSeparator();
     addWidget(mUserEdit);
-    addSeparator();
     addWidget(mPasswordEdit);
+
+    layout()->setSpacing(4);
 
     QWidget* empty = new QWidget();
     empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);

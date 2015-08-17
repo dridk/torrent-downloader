@@ -15,7 +15,7 @@ public :
 
 
 
-     QNetworkReply * getResultList(int page=0);
+     QNetworkReply * getResultList(int page=0, const QString& search = QString());
      QNetworkReply * getResult(int resultId);
 
      QNetworkReply * getFile(const QUrl& url);

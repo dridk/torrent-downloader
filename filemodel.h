@@ -33,7 +33,7 @@ public:
     int count() const;
     int checkedCount() const;
     FileItem& item(int row) ;
-
+    bool isLoading();
     QList<FileItem> checkedItems() const;
 
     static QIcon extIcon(const QString& ext);
@@ -45,16 +45,16 @@ public slots:
 protected:
     void parseBamTable();
     void parseVcfTable();
-
+    void setLoading(bool active);
 
 signals:
     void finished();
     void checkedCountChanged(int count);
-
+    void loadingChanged(bool active);
 private:
     QList<FileItem> mDatas;
     QList<QString> mExtensions;
-    bool mPending;
+    bool mLoading;
     QWebPage * mWebPage;
 
 
